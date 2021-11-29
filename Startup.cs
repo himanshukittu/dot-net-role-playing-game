@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using dot_net_role_playing_game.Data;
 
 namespace asp_net_course_udemy
 {
@@ -35,6 +37,9 @@ namespace asp_net_course_udemy
             });
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<ICharacterService, CharacterService>();
+            services.AddDbContext<DataContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"))
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

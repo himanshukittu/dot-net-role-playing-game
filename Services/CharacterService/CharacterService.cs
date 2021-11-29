@@ -5,16 +5,19 @@ using System.Threading.Tasks;
 using asp_net_course_udemy.Dtos.Character;
 using asp_net_course_udemy.Models;
 using AutoMapper;
+using dot_net_role_playing_game.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace asp_net_course_udemy.Services.CharacterService
 {
     public class CharacterService : ICharacterService
     {
         private readonly IMapper _mapper;
-        public CharacterService(IMapper mapper)
+        private readonly DataContext _DbContext;
+        public CharacterService(IMapper mapper, DataContext dbContext)
         {
+            _DbContext = dbContext;
             _mapper = mapper;
-
         }
         private static List<Character> characters = new List<Character>{
             new Character(),
@@ -30,13 +33,15 @@ namespace asp_net_course_udemy.Services.CharacterService
 
         public async Task<List<GetCharacterDTO>> GetAllCharacters()
         {
-            return characters.Select(c => _mapper.Map<GetCharacterDTO>(c)).ToList();
+            var dbCharacters = await _DbContext.Characters.ToListAsync();
+            return dbCharacters.Select(c => _mapper.Map<GetCharacterDTO>(c)).ToList();
         }
 
 
         public async Task<GetCharacterDTO> GetCharacterById(int id)
         {
-            return _mapper.Map<GetCharacterDTO>(characters.FirstOrDefault(c => c.Id == id));
+            var dbSingleCharacter = await _DbContext.Characters.FirstOrDefaultAsync<Character>(c=>c.Id == id);
+            return _mapper.Map<GetCharacterDTO>(dbSingleCharacter);
         }
 
         public async Task<GeneralResponse<object>> UpdateCharacter(UpdateCharacterDTO updatedCharacter)
